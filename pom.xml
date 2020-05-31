@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.hjb</groupId>
+    <artifactId>syllabus</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>syllabus</name>
+    <description>SpringBoot课表</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <mybatis-plus-version>3.3.2</mybatis-plus-version>
+        <okhttp.version>3.13.1</okhttp.version>
+        <webmagic.version>0.7.3</webmagic.version>
+        <hutool-all.version>3.2.1</hutool-all.version>
+        <pagehelper.version>1.2.5</pagehelper.version>
+        <druid.version>1.1.21</druid.version>
+        <nekohtml.version>1.9.22</nekohtml.version>
+        <thymeleaf-layout.version>2.3.0</thymeleaf-layout.version>
+        <thymeleaf-java8time.version>3.0.0.RELEASE</thymeleaf-java8time.version>
+
+        <!-- dockerhub 用户名 -->
+        <docker.image.prefix>hjb</docker.image.prefix>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis-plus-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- okhttp start -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+        <!-- okhttp end -->
+        <!-- 爬虫 start -->
+        <dependency>
+            <groupId>us.codecraft</groupId>
+            <artifactId>webmagic-extension</artifactId>
+            <version>${webmagic.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>fastjson</artifactId>
+                    <groupId>com.alibaba</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 爬虫 end -->
+        <!-- 工具集 start -->
+        <dependency>
+            <groupId>com.xiaoleilu</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool-all.version}</version>
+        </dependency>
+        <!-- 工具集 end -->
+        <!-- pagehelper 依赖 -->
+        <!--<dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${pagehelper.version}</version>
+        </dependency>-->
+        <!-- pagehelper 依赖 结束 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- html非严格支持 -->
+        <dependency>
+            <groupId>net.sourceforge.nekohtml</groupId>
+            <artifactId>nekohtml</artifactId>
+            <version>${nekohtml.version}</version>
+        </dependency>
+        <!-- layout支持 -->
+        <!--<dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+            <version>${thymeleaf-layout.version}</version>
+        </dependency>-->
+        <!-- thymeleaf java8时间支持 -->
+        <!--<dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-java8time</artifactId>
+            <version>${thymeleaf-java8time.version}</version>
+        </dependency>-->
+        <!-- thymeleaf 依赖 结束 -->
+
+        <!-- 数据源 依赖 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+        <!-- 数据源 依赖 结束 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- docker部署支持 -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <configuration>
+                    <!--镜像名称  syllabus/blog-->
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <!--指定标签  java版本-->
+                    <imageTags>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <!-- 基础镜像jdk1.8  指定基础镜像 -->
+                    <baseImage>java</baseImage>
+                    <!-- 制作者信息 -->
+                    <maintainer>hujiangbing 1525947163@qq.com</maintainer>
+                    <!-- 切换目录/ROOT -->
+                    <workdir>/ROOT</workdir>
+                    <!-- 运行命令 -->
+                    <!--<cmd>["java", "-version"]</cmd>-->
+                    <!-- 执行jar  这里的finalName是打包后的jar文件名 -->
+                    <entryPoint>["java", "-jar", "${project.build.finalName}.jar"]</entryPoint>
+
+                    <!-- 指定dockerfile路径 -->
+                    <!--<dockerDirectory>${project.basedir}/src/main/resources/docker</dockerDirectory>-->
+                    <!--指定pem证书文件路径地址 -->
+                    <dockerCertPath>${project.basedir}/src/main/resources/docker/pem</dockerCertPath>
+                    <!--指定远程docker api地址-->
+                    <dockerHost>https://120.77.215.148:2375</dockerHost>
+                    <!--复制jar包到docker容器指定目录配置-->
+                    <resources>
+                        <resource>
+                            <targetPath>/ROOT</targetPath>
+                            <!-- 用于指定需要复制的根目录。${project.build.directory}表示target目录 -->
+                            <directory>${project.build.directory}</directory>
+                            <!-- 用于指定需要复制的文件。${project.build.finalName}.jar 指打包后的jar文件名 -->
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

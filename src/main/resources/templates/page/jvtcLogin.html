@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>九职教务账户登录</title>
+    <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui-v2.5.6/css/layui.css"/>
+    <style type="text/css">
+        body, html {
+            font-family: "Microsoft YaHei", Helvetica, Arial, Lucida Grande, Tahoma, sans-serif;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .layui-field-title legend{
+            font-weight: 500;
+        }
+
+        #colophon {
+            position: absolute;
+            bottom: 0px;
+            width: 100%;
+        }
+        .layui-container{
+            display: block;
+            position: relative;
+            left: 0;
+            top: 0;
+            padding: 110px 0;
+            height: 100%;
+            min-height: 100%;
+            box-sizing: border-box;
+        }
+
+        #login {
+            width: 375px;
+            margin: 50px auto;
+            box-sizing: border-box;
+        }
+
+        .layui-elem-field legend {
+            margin: 0 auto;
+        }
+
+        .layui-form-checkbox span {
+            margin-top: -1.5px;
+        }
+
+        .layui-btn-fluid {
+            margin-top: 20px;
+            width: 100%;
+        }
+        .login-message {
+            left: 1px;
+            color: #ff4035;
+            font-size: 13px;
+        }
+        .footer{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            line-height: 30px;
+            padding: 20px;
+            text-align: center;
+            box-sizing: border-box;
+            color: rgba(0,0,0,.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-container">
+        <div id="login">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>请使用九职教务系统账号登录</legend>
+            </fieldset>
+            <form name="loginForm" id="loginForm" method="post" class="layui-form" action="/management/login"
+                  onsubmit="return submitForm()">
+                <p>
+                    <label for="user_login">用户名<br/>
+                        <input type="text" name="username" id="user_login" class="input layui-input" size="20" required
+                               placeholder="请输入用户名" autofocus/></label>
+                </p>
+                <p>
+                    <label for="user_pass">密码<br/>
+                        <input type="password" name="password" id="user_pass" class="input layui-input" size="20" required
+                               placeholder="请输入密码"/>
+                    </label>
+                </p>
+                <div class="layui-form-item">
+                    <p class="form-rememberme-message">
+                        <span class="login-message" th:text="${message}"></span>
+                    </p>
+                    <div>
+                        <button class="layui-btn layui-btn-fluid" lay-submit="" type="submit">登&nbsp;&nbsp;&nbsp;录</button>
+                    </div>
+                </div>
+                <input name="encoded" id="encoded" type="hidden" value="">
+            </form>
+
+        </div>
+
+        <footer class="footer">
+            <p style="text-align: center;">Copyright © 2020
+                <a href="/" target="_blank" rel="noopener noreferrer"></a>
+                All rights reserved.&nbsp;&nbsp;
+                <span style="font-size: 12px;"><a href="http://www.beian.miit.gov.cn/"
+                                                  target="_blank">赣ICP备18007918号</a></span>
+            </p>
+        </footer>
+    </div>
+    <!-- 加密方法 -->
+    <script type="text/javascript" src="https://www.layuicdn.com/layui-v2.5.6/layui.js"></script>
+    <script type="text/javascript" th:src="@{/js/conwork.js}"></script>
+    <script type="text/javascript">
+
+        // 动态表单效果
+        layui.use('form', function () {
+            var form = layui.form, layer = layui.layer;
+
+        });
+
+        // 载入页面时输入框获取焦点
+        function wp_attempt_focus() {
+            setTimeout(function () {
+                try {
+                    d = document.getElementById('user_login');
+                    d.focus();
+                    d.select();
+                } catch (e) {
+                }
+            }, 200);
+        }
+
+        wp_attempt_focus();
+        if (typeof wpOnload == 'function') wpOnload();
+
+        function submitForm() {
+            try {
+                var xh = document.getElementById("user_login").value;
+                var pwd = document.getElementById("user_pass").value;
+                if (xh == "") {
+                    layer.msg("用户名不能为空！");
+                    return false;
+                }
+                if (pwd == "") {
+                    layer.msg("密码不能为空！");
+                    return false;
+                }
+                var account = encodeInp(xh);
+                var passwd = encodeInp(pwd);
+                var encoded = account + "%%%" + passwd;
+                document.getElementById("encoded").value = encoded;
+                document.getElementById("user_pass").value = "";
+                layer.open({
+                    type: 3
+                    ,shade: 0.2
+                });
+                return true;
+            } catch (e) {
+                layer.msg(e);
+                return false;
+            }
+        }
+
+    </script>
+</body>
+</html>

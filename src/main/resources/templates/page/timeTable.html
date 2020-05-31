@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="">
+    <title>课表</title>
+    <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui-v2.5.6/css/layui.css"/>
+    <style type="text/css">
+        .title {
+            height: 70px;
+            line-height: 70px;
+            text-align: center;
+            padding: 20px;
+            background-color: #F2F2F2;
+        }
+
+        .title a {
+            display: block;
+            text-decoration: none;
+            font-size: 20px;
+            width: 100%;
+            height: 100%;
+        }
+        tr:nth-child(even){
+            background-color: #f2f2f2;
+        }
+        .layui-table{
+            margin: 0;
+        }
+        .week-number{
+            font-size: 25px;
+            font-weight: bold;
+            font-family: "Microsoft YaHei";
+        }
+        .layui-col-md4:nth-child(odd) > .layui-card {
+            background-color: #eaeaea;
+            font-size: 20px;
+        }
+        .refresh{
+            margin: 15px;
+        }
+        .week-number::before{
+            content: '';
+            width: 0;
+            height: 0;
+            position: absolute;
+            left: -69px;
+            top: 0;
+            z-index: 100;
+            border: 35px solid #46b0ff;
+            border-color: transparent #46b0ff transparent transparent;
+        }
+        .week-number::after{
+            content: '';
+            width: 0;
+            height: 0;
+            position: absolute;
+            right: -69px;
+            top: 0;
+            z-index: 100;
+            border: 35px solid #46b0ff;
+            border-color: transparent transparent transparent #46b0ff;
+        }
+        .week-number>.layui-card{
+            background-color: #46b0ff;
+            color: #FFF;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body>
+<p class="refresh"  th:if="${JVTC_USER_ID != null}">
+    <span>课表不准确？</span>
+    <a th:href="${refreshUrl}">
+        <button type="button" class="layui-btn">
+            <i class="layui-icon">&#xe669;</i> 强制刷新
+        </button>
+    </a>
+</p>
+<div class="title" th:if="${JVTC_USER_ID != null}">
+    <div class="layui-row">
+        <div class="layui-col-xs4">
+            <div class="layui-card">
+                <a th:href="@{'/kb/' + ${JVTC_USER_ID} + '/' + ${week - 1}}" target="_self">上一周</a>
+            </div>
+        </div>
+        <div class="layui-col-xs4 week-number">
+            <div class="layui-card" th:text="'第' + ${week} + '周'">
+                第几周
+            </div>
+        </div>
+        <div class="layui-col-xs4">
+            <div class="layui-card">
+                <a th:href="@{'/kb/' + ${JVTC_USER_ID} + '/' + ${week + 1}}" target="_self">下一周</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="layui-form">
+    <th:block th:utext="${html}"></th:block>
+</div>
+</body>
+</html>

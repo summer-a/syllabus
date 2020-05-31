@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>机器人报课管理</title>
+    <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui-v2.5.6/css/layui.css"/>
+    <style type="text/css">
+        .footer{
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            line-height: 30px;
+            padding: 20px;
+            text-align: center;
+            box-sizing: border-box;
+            color: rgba(0,0,0,.5);
+        }
+    </style>
+</head>
+<body>
+<!-- 提示添加qq和q群 -->
+<div class="layui-container" style="margin-bottom: 50px;">
+    <div class="layui-row">
+        <div style="padding-bottom: 10px;padding-top: 10px;">
+            <button class="layui-btn" id="addRobot">添加一个机器人</button>
+            <button class="layui-btn layui-btn-primary" style="float: right;" id="logout">退出登录</button>
+        </div>
+        <blockquote class="layui-elem-quote" style="margin-bottom: 0;">请先添加QQ:<b>3236256929</b>，由该QQ进行报课。如果是群，就将该QQ拉入群。
+        </blockquote>
+        <!-- 表格 -->
+        <table id="robot" lay-filter="robot"></table>
+
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            <p><b>注意事项</b></p>
+            <ul class="init-ul">
+                <li>添加QQ号3236256929 ( 如果没及时同意通过验证请联系QQ:1525947163 )</li>
+                <li>当你设置类型为QQ号，则机器人会发送消息到目标号码对应的QQ号中
+                    同理，选择了群号，则会把消息发送到目标号码对应的群中
+                </li>
+                <li>早中晚三个时段对应了机器人会在早/中/晚的课程在指定的时间进行提醒 ( 如果有第五节大课则下午会在5点报课 )</li>
+            </ul>
+        </blockquote>
+
+    </div>
+</div>
+<footer class="footer">
+    <p style="text-align: center;">Copyright © 2020
+        <a href="/" target="_blank" rel="noopener noreferrer"></a>
+        All rights reserved.&nbsp;&nbsp;
+        <span style="font-size: 12px;"><a href="http://www.beian.miit.gov.cn/"
+                                          target="_blank">赣ICP备18007918号</a></span>
+    </p>
+</footer>
+<script src="https://www.layuicdn.com/layui-v2.5.6/layui.js"></script>
+<!-- 表格编辑栏 -->
+<script type="text/html" id="operate">
+    <div style="margin: 0 auto;">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>编辑
+        </a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </a>
+    </div>
+</script>
+<!-- 机器人报课状态 -->
+<script type="text/html" id="robotStatus">
+    {{#  if(d.status == 1){ }}
+    <span class="layui-badge layui-bg-green">正常</span>
+    {{#  } else { }}
+    <span class="layui-badge layui-bg-orange">停用</span>
+    {{#  } }}
+</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var vip =  false;
+    layui.use(['table', 'layer', 'jquery'], function(){
+        var table = layui.table
+            ,layer = layui.layer
+            ,$ = layui.jquery;
+
+        // 表格生成
+        table.render({
+            elem: '#robot'
+            ,height: 234
+            ,url: '/management/getRobotMindList' //数据接口
+            ,page: false //开启分页
+            ,loading: true
+            ,text: {
+                none: '请添加一个机器人(普通用户仅可添加一个)'
+            }
+            ,cols: [
+                [
+                    {field: 'robotName', title: '机器人名', width:170}
+                    ,{field: 'type', title: '类型', width:90}
+                    ,{field: 'target', title: '目标号码', width:140}
+                    ,{field: 'remindAm', title: '早上提醒时段', width: 140}
+                    ,{field: 'remindPm', title: '中午提醒时段', width: 140}
+                    ,{field: 'remindEve', title: '晚上提醒时段', width: 140}
+                    ,{field: 'status', title: '状态', width: 75, templet: '#robotStatus'}
+                    , {
+                    field: 'operate',
+                    title: '操作',
+                    width: 145,
+                    align: 'center',
+                    toolbar: '#operate',
+                    fixed: "right",
+                    unresize: true
+                }
+                ]
+            ]
+            ,done: function(res, curr, count) {
+                if (!vip && count >= 1) {
+                    $("#addRobot").addClass("layui-btn-disabled").text("普通用户只能添加一个机器人");
+                    vip = false;
+                } else {
+                    vip = true;
+                }
+            }
+        });
+
+        // 事件操作
+        table.on('tool(robot)', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'edit') {
+                var edit = layer.open({
+                    type: 2,
+                    title: '编辑',
+                    area: ['440px', '543px'],
+                    maxmin: true,
+                    anim: 5,
+                    content: ['/management/addOrEditPage?id=' + data.id, 'no'] //iframe的url，no代表不显示滚动条
+                })
+                console.log(navigator.userAgent)
+                // 移动端全屏展示
+                if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+                    layer.full(edit)
+                }
+            } else if (event === 'del') {
+                layer.confirm('确定删除“' + data.robotName + '”吗？', {
+                    btn: ['确定','取消'] //按钮
+                }, function(){
+                    $.ajax({
+                        url: '/management/deleteRobot',
+                        data: {id: data.id},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function(data) {
+                            if (data.code == 200) {
+                                layer.msg('已删除', {icon: 1});
+                                location.reload(true);
+                            } else {
+                                layer.msg('删除失败', {icon: 5})
+                            }
+                        },error: function() {
+                            layer.msg('删除失败', {icon: 5})
+                        }
+                    })
+
+                }, function(){
+
+                });
+            }
+        })
+
+        // 添加报课
+        $("#addRobot").click(function() {
+            if (vip) {
+                var add = layer.open({
+                    type: 2,
+                    title: '添加',
+                    area: ['500px', '530px'],
+                    maxmin: true,
+                    anim: 5,
+                    content: ['/management/addOrEditPage', 'no']
+                })
+                // layer.full(add)
+            }
+        })
+
+        // 退出登录
+        $("#logout").click(function() {
+            location.href = "/management/logout";
+        })
+
+    });
+
+    /*]]>*/
+</script>
+</body>
+</html>
